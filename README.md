@@ -1,7 +1,7 @@
 # cov-tinker
 
-## Daily new cases
+## Daily incremental incidence
 ![Cumulative growth](https://raw.githubusercontent.com/seninp-bioinfo/cov-tinker/master/figures/new_daily.png)
 
-## Cumulative cases growth 
+## Daily cumulative incidence
 ![Cumulative growth](https://raw.githubusercontent.com/seninp-bioinfo/cov-tinker/master/figures/total_growth.png)

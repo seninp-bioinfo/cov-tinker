@@ -73,7 +73,7 @@ p_growth <- ggplot(dm, aes(x=date, y=value, col=variable)) +
   geom_line(size=.5) + geom_point(size=2) +
   labs(x="Date, 2020", y="Confirmed cases") +
   theme(axis.text.x=element_text(angle=60, hjust=1)) +
-  ggtitle("Cov19 cases growth") +
+  ggtitle("Cov19: daily cumulative incidence") +
   scale_colour_viridis_d(name="Countries") + theme_dark() +
   theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
     panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 
@@ -101,7 +101,7 @@ p_growth <- ggplot(dm, aes(x=date, y=value, fill=variable)) +
   geom_bar(stat = "identity") +
   labs(x="Date, 2020", y="Confirmed cases") +
   theme(axis.text.x=element_text(angle=60, hjust=1)) +
-  ggtitle("Cov19 cases daily") +
+  ggtitle("Cov19: daily incremental incidence") +
   scale_fill_viridis_d(name="Countries") + theme_dark() +
   theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
         panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 

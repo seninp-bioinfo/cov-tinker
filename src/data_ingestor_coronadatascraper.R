@@ -95,6 +95,7 @@ dev.off()
 # CASES
 dd_diff <- mutate_if(dd_m, is.numeric, funs(. - lag(.)))
 dd_diff <- mutate_if(dd_diff, is.numeric, ~replace(., is.na(.), 0))
+saveRDS(dd_diff, "data/daily_incidence.Rds", compress=T)
 
 dm <- reshape2::melt(dd_diff, id=1)
 p_growth <- ggplot(dm, aes(x=date, y=value, fill=variable)) +

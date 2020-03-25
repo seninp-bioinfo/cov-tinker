@@ -66,6 +66,7 @@ dd_m <- Reduce(function(...) merge(..., by='date', all=TRUE),
              list(dd_m, dd_fr_cases, dd_it_cases, dd_sp_cases, dd_gr_cases))
 names(dd_m) <- c("date", "France", "Italy", "Germany", "Spain")
 dd_m <- filter(dd_m, date>as.Date("15/02/2020", "%d/%m/%y"))
+saveRDS("../data/uptodate4countries.Rds")
 
 dm <- reshape2::melt(dd_m, id=1)
 p_growth <- ggplot(dm, aes(x=date, y=value, col=variable)) +
@@ -85,7 +86,7 @@ p_growth
 
 # ggsave(p_growth, filename = "figures/total_growth.png", width = 8, height = 6, dpi = 400, type = "cairo")
 Cairo(width = 800, height = 550, 
-      file="figures/total_growth.png", 
+      file="../figures/total_growth.png", 
       type="png", pointsize=14, 
       bg = "transparent", canvas = "white", units = "px", dpi = 90)
 print(p_growth)

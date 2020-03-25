@@ -66,7 +66,7 @@ dd_m <- Reduce(function(...) merge(..., by='date', all=TRUE),
              list(dd_m, dd_fr_cases, dd_it_cases, dd_sp_cases, dd_gr_cases))
 names(dd_m) <- c("date", "France", "Italy", "Germany", "Spain")
 dd_m <- filter(dd_m, date>as.Date("15/02/2020", "%d/%m/%y"))
-saveRDS("../data/uptodate4countries.Rds")
+saveRDS(dd_m, "data/uptodate4countries.Rds", compress=T)
 
 dm <- reshape2::melt(dd_m, id=1)
 p_growth <- ggplot(dm, aes(x=date, y=value, col=variable)) +
@@ -86,7 +86,36 @@ p_growth
 
 # ggsave(p_growth, filename = "figures/total_growth.png", width = 8, height = 6, dpi = 400, type = "cairo")
 Cairo(width = 800, height = 550, 
-      file="../figures/total_growth.png", 
+      file="figures/total_growth.png", 
+      type="png", pointsize=14, 
+      bg = "transparent", canvas = "white", units = "px", dpi = 90)
+print(p_growth)
+dev.off()
+
+# CASES
+dd_diff <- mutate_if(dd_m, is.numeric, funs(. - lag(.)))
+dd_diff <- mutate_if(dd_diff, is.numeric, ~replace(., is.na(.), 0))
+
+dm <- reshape2::melt(dd_diff, id=1)
+p_growth <- ggplot(dm, aes(x=date, y=value, fill=variable)) +
+  geom_bar(stat = "identity") +
+  labs(x="Date, 2020", y="Confirmed cases") +
+  theme(axis.text.x=element_text(angle=60, hjust=1)) +
+  ggtitle("Cov19 cases daily") +
+  scale_fill_viridis_d(name="Countries") + theme_dark() +
+  theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
+        panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 
+        panel.grid.minor = element_line(size = 0.25, linetype = 'solid',colour = "white"),
+        legend.background = element_rect(fill="lightgrey", size=0.5, linetype="solid", colour ="grey"),
+        legend.key = element_rect(fill="grey75", size=0.5, linetype="solid", colour ="grey60"),
+        legend.key.width = unit(20, unit = "pt")
+  ) + 
+  facet_wrap(~variable,scales = "fixed",strip.position="right",ncol=1)
+p_growth
+
+# ggsave(p_growth, filename = "figures/total_growth.png", width = 8, height = 6, dpi = 400, type = "cairo")
+Cairo(width = 800, height = 550, 
+      file="figures/new_daily.png", 
       type="png", pointsize=14, 
       bg = "transparent", canvas = "white", units = "px", dpi = 90)
 print(p_growth)

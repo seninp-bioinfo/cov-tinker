@@ -83,4 +83,10 @@ p_growth <- ggplot(dm, aes(x=date, y=value, col=variable)) +
   )
 p_growth
 
-ggsave(p_growth, filename = "figures/total_growth.png", width = 8, height = 6, dpi = 400, type = "cairo")
+# ggsave(p_growth, filename = "figures/total_growth.png", width = 8, height = 6, dpi = 400, type = "cairo")
+Cairo(width = 600, height = 450, 
+      file="figures/total_growth.png", 
+      type="png", pointsize=14, 
+      bg = "transparent", canvas = "white", units = "px", dpi = 90)
+print(p_growth)
+dev.off()

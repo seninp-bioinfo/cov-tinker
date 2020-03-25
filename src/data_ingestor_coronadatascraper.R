@@ -116,7 +116,7 @@ p_growth
 # ggsave(p_growth, filename = "figures/total_growth.png", width = 8, height = 6, dpi = 400, type = "cairo")
 Cairo(width = 800, height = 550, 
       file="figures/new_daily.png", 
-      type="png", pointsize=14, 
+      type="png", pointsize=10, 
       bg = "transparent", canvas = "white", units = "px", dpi = 90)
 print(p_growth)
 dev.off()

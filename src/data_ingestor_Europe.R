@@ -60,11 +60,35 @@ p_growth <- ggplot(dd_gr_cases, aes(x=date, y=value)) +
   ggtitle("GERMANY: Cov19 cases growth")
 p_growth
 
+# RUSSIA
+dd_ru = filter(dd, country=="RUS")
+dd_ru = filter(dd_ru, population==max(dd_ru$population, na.rm=T))
+dd_ru_cases = as.data.frame(select(filter(dd_ru, type=="cases"), date, value))
+p_growth <- ggplot(dd_ru_cases, aes(x=date, y=value)) +
+  geom_line() + 
+  geom_point() +
+  xlab("") +
+  theme(axis.text.x=element_text(angle=60, hjust=1)) +
+  ggtitle("Russia: Cov19 cases growth")
+p_growth
+
+# USA
+dd_us = filter(dd, country=="USA")
+dd_us = filter(dd_us, population==max(dd_us$population, na.rm=T))
+dd_us_cases = as.data.frame(select(filter(dd_us, type=="cases"), date, value))
+p_growth <- ggplot(dd_us_cases, aes(x=date, y=value)) +
+  geom_line() + 
+  geom_point() +
+  xlab("") +
+  theme(axis.text.x=element_text(angle=60, hjust=1)) +
+  ggtitle("USA: Cov19 cases growth")
+p_growth
+
 # MERGE
 dd_m <- data.frame(date=seq(as.Date("01/01/2020", "%d/%m/%y"), Sys.Date()-1, by='day'))
 dd_m <- Reduce(function(...) merge(..., by='date', all=TRUE),
-             list(dd_m, dd_fr_cases, dd_it_cases, dd_sp_cases, dd_gr_cases))
-names(dd_m) <- c("date", "France", "Italy", "Germany", "Spain")
+             list(dd_m, dd_fr_cases, dd_it_cases, dd_sp_cases, dd_gr_cases, dd_ru_cases, dd_us_cases))
+names(dd_m) <- c("date", "France", "Italy", "Germany", "Spain", "Russia", "USA")
 dd_m <- filter(dd_m, date>as.Date("15/02/2020", "%d/%m/%y"))
 saveRDS(dd_m, "data/Europe_cases.Rds", compress=T)
 

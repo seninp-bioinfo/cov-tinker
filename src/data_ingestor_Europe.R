@@ -10,10 +10,13 @@ library(Cairo)
 
 # https://coronadatascraper.com/#sources
 # https://github.com/lazd/coronadatascraper
+# https://www.iban.com/country-codes
+
 dd = read_csv("https://coronadatascraper.com/timeseries-tidy.csv")
+grepl("FRA", unique(dd$country))
 
 # FRANCE
-dd_fr = filter(dd, country=="FRA", grepl("opencovid19-fr", url))
+dd_fr = filter(dd, country=="FRA")
 dd_fr = filter(dd_fr, population==max(dd_fr$population, na.rm=T))
 dd_fr_cases = as.data.frame(select(filter(dd_fr, type=="cases"), date, value))
 p_growth <- ggplot(dd_fr_cases, aes(x=date, y=value)) +
@@ -85,7 +88,7 @@ p_growth <- ggplot(dd_us_cases, aes(x=date, y=value)) +
 p_growth
 
 # MERGE
-dd_m <- data.frame(date=seq(as.Date("01/01/2020", "%d/%m/%y"), Sys.Date()-1, by='day'))
+dd_m <- data.frame(date=seq(as.Date("01/01/2020", "%d/%m/%y"), Sys.Date(), by='day')) ### -1 here
 dd_m <- Reduce(function(...) merge(..., by='date', all=TRUE),
              list(dd_m, dd_fr_cases, dd_it_cases, dd_sp_cases, dd_gr_cases, dd_ru_cases, dd_us_cases))
 names(dd_m) <- c("date", "France", "Italy", "Germany", "Spain", "Russia", "USA")

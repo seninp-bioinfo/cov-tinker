@@ -1,3 +1,5 @@
+library(tidyr)
+library(lubridate)
 library(readr)
 library(plyr)
 library(dplyr)
@@ -8,12 +10,35 @@ library(viridisLite)
 library(gridExtra)
 library(Cairo)
 
-# https://coronadatascraper.com/#sources
-# https://github.com/lazd/coronadatascraper
-dd = read_csv("https://coronadatascraper.com/timeseries-tidy.csv")
+# https://timchurches.github.io/blog/posts/2020-02-18-analysing-covid-19-2019-ncov-outbreak-data-with-r-part-1/#estimating-changes-in-the-effective-reproduction-number
+destfile = "./data/provinces_confirmed_jh.rda"
+if (!file.exists(destfile)) {
+  provinces_confirmed_jh <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv") %>% 
+    rename(province = "Province/State", country_region = "Country/Region") %>% 
+    pivot_longer(-c(province, country_region, Lat, Long), 
+                 names_to = "Date", values_to = "cumulative_cases") %>% 
+    mutate(Date = as.Date(mdy_hm(paste(Date, "23:59", tz = "UTC")), 
+            tz = "Asia/Shanghai")) %>% filter(country_region == 
+            "Mainland China") %>% group_by(province) %>% 
+            arrange(province, Date) %>% group_by(province) %>% 
+            mutate(incident_cases = c(0, diff(cumulative_cases))) %>% ungroup() %>% 
+            select(-c(country_region, Lat, Long, cumulative_cases)) %>% 
+            pivot_wider(Date, names_from = province, values_from = incident_cases) %>% 
+          mutate(source = "Johns Hopkins University")
+  save(provinces_confirmed_jh, file = destfile)
+} else {
+  load(destfile)
+}
 
-# FRANCE
-dd_fr = filter(dd, country=="FRA", grepl("opencovid19-fr", url))
+
+
+dd = filter(provinces_confirmed_jh, 
+            province %in% c("Hubei", "Beijing", "Guangdong", "Henan", 
+                       "Zhejiang", "Hunan", "Anhui", "Jiangxi", "Jiangsu", "Chongqing", 
+                       "Shandong"))
+
+# CHINA
+dd_cn = filter(dd, country=="CHN")
 dd_fr = filter(dd_fr, population==max(dd_fr$population, na.rm=T))
 dd_fr_cases = as.data.frame(select(filter(dd_fr, type=="cases"), date, value))
 p_growth <- ggplot(dd_fr_cases, aes(x=date, y=value)) +

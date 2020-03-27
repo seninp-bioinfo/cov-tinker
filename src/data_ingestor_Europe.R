@@ -4,6 +4,7 @@ library(dplyr)
 library(reshape2)
 
 library(ggplot2)
+library(scales)
 library(viridisLite)
 library(gridExtra)
 library(Cairo)
@@ -88,7 +89,7 @@ p_growth <- ggplot(dd_us_cases, aes(x=date, y=value)) +
 p_growth
 
 # MERGE
-dd_m <- data.frame(date=seq(as.Date("01/01/2020", "%d/%m/%y"), Sys.Date(), by='day')) ### -1 here
+dd_m <- data.frame(date=seq(as.Date("01/01/2020", "%d/%m/%y"), Sys.Date()-1, by='day')) ### -1 here
 dd_m <- Reduce(function(...) merge(..., by='date', all=TRUE),
              list(dd_m, dd_fr_cases, dd_it_cases, dd_sp_cases, dd_gr_cases, dd_ru_cases, dd_us_cases))
 names(dd_m) <- c("date", "France", "Italy", "Germany", "Spain", "Russia", "USA")
@@ -99,15 +100,17 @@ dm <- reshape2::melt(dd_m, id=1)
 p_growth <- ggplot(dm, aes(x=date, y=value, col=variable)) +
   geom_line(size=.5) + geom_point(size=2) +
   labs(x="Date, 2020", y="Confirmed cases") +
+  scale_x_date(breaks = "day", labels=date_format("%d-%m")) +
   theme(axis.text.x=element_text(angle=60, hjust=1)) +
   ggtitle("Cov19: daily cumulative incidence") +
   scale_colour_viridis_d(name="Countries") + theme_dark() +
   theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
     panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 
-    panel.grid.minor = element_line(size = 0.25, linetype = 'solid',colour = "white"),
-    legend.background = element_rect(fill="lightgrey", size=0.5, linetype="solid", colour ="grey"),
+    panel.grid.minor = element_blank(),
+    legend.background = element_rect(fill="lightgrey", size=0.5, linetype="solid", colour ="lightgrey"),
     legend.key = element_rect(fill="grey75", size=0.5, linetype="solid", colour ="grey60"),
-    legend.key.width = unit(20, unit = "pt")
+    legend.key.width = unit(20, unit = "pt"),
+    axis.text.x = element_text(angle = 55, hjust = 1)
   )
 p_growth
 
@@ -128,15 +131,17 @@ dm <- reshape2::melt(dd_diff, id=1)
 p_growth <- ggplot(dm, aes(x=date, y=value, fill=variable)) +
   geom_bar(stat = "identity") +
   labs(x="Date, 2020", y="Confirmed cases") +
+  scale_x_date(breaks = "day", labels=date_format("%d-%m")) +
   theme(axis.text.x=element_text(angle=60, hjust=1)) +
   ggtitle("Cov19: daily incremental incidence") +
   scale_fill_viridis_d(name="Countries") + theme_dark() +
   theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
         panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 
-        panel.grid.minor = element_line(size = 0.25, linetype = 'solid',colour = "white"),
+        panel.grid.minor = element_blank(),
         legend.background = element_rect(fill="lightgrey", size=0.5, linetype="solid", colour ="grey"),
         legend.key = element_rect(fill="grey75", size=0.5, linetype="solid", colour ="grey60"),
-        legend.key.width = unit(20, unit = "pt")
+        legend.key.width = unit(20, unit = "pt"),
+        axis.text.x = element_text(angle = 55, hjust = 1)
   ) + 
   facet_wrap(~variable,scales = "fixed",strip.position="right",ncol=1)
 p_growth

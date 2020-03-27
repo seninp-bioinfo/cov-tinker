@@ -5,6 +5,7 @@ library(reshape2)
 
 library(ggplot2)
 library(scales)
+library(RColorBrewer)
 library(viridisLite)
 library(gridExtra)
 library(Cairo)
@@ -97,13 +98,24 @@ dd_m <- filter(dd_m, date>as.Date("15/02/2020", "%d/%m/%y"))
 saveRDS(dd_m, "data/Europe_cases.Rds", compress=T)
 
 dm <- reshape2::melt(dd_m, id=1)
-p_growth <- ggplot(dm, aes(x=date, y=value, col=variable)) +
+colourCount = length(unique(dm$variable))
+getPalette = colorRampPalette(brewer.pal(8, "Dark2"))
+labelz = unique(dm$variable)
+shapez = seq(15,(15+length(unique(dm$variable))))
+
+p_growth <- ggplot(dm, aes(x=date, y=value, colour=variable, shape = variable)) +
   geom_line(size=.5) + geom_point(size=2) +
   labs(x="Date, 2020", y="Confirmed cases") +
   scale_x_date(breaks = "day", labels=date_format("%d-%m")) +
   theme(axis.text.x=element_text(angle=60, hjust=1)) +
   ggtitle("Cov19: daily cumulative incidence") +
-  scale_colour_viridis_d(name="Countries") + theme_dark() +
+  scale_colour_manual(name = "Countries",
+                      labels = labelz,
+                      values = getPalette(colourCount)) +   
+  scale_shape_manual(name = "Countries",
+                     labels = labelz,
+                     values = shapez) +  
+  theme_dark() +
   theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
     panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 
     panel.grid.minor = element_blank(),
@@ -128,13 +140,21 @@ dd_diff <- mutate_if(dd_diff, is.numeric, ~replace(., is.na(.), 0))
 saveRDS(dd_diff, "data/Europe_daily_incidence.Rds", compress=T)
 
 dm <- reshape2::melt(dd_diff, id=1)
+colourCount = length(unique(dm$variable))
+getPalette = colorRampPalette(brewer.pal(8, "Dark2"))
+labelz = unique(dm$variable)
+shapez = seq(15,(15+length(unique(dm$variable))))
+
 p_growth <- ggplot(dm, aes(x=date, y=value, fill=variable)) +
   geom_bar(stat = "identity") +
   labs(x="Date, 2020", y="Confirmed cases") +
   scale_x_date(breaks = "day", labels=date_format("%d-%m")) +
   theme(axis.text.x=element_text(angle=60, hjust=1)) +
   ggtitle("Cov19: daily incremental incidence") +
-  scale_fill_viridis_d(name="Countries") + theme_dark() +
+  scale_colour_manual(name = "Countries",
+                      labels = labelz,
+                      values = getPalette(colourCount)) +   
+  theme_dark() +
   theme(panel.background=element_rect(fill = "lightgrey", colour = "grey", size = 0.5, linetype = "solid"),
         panel.grid.major=element_line(size = 0.5, linetype = 'solid',colour = "white"), 
         panel.grid.minor = element_blank(),
